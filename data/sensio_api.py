@@ -1,6 +1,5 @@
 import requests
 from config.config import SENSIO_BASE_URL, SENSIO_API_KEY
-from utils.helpers import print_limited_items
 
 def get_products():
     url = f"{SENSIO_BASE_URL}/items"
@@ -11,14 +10,14 @@ def get_products():
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        items = response.json()
-        # Verificar se a resposta é uma lista
-        if isinstance(items, list):
+        response_data = response.json()
+        items = response_data.get('response', {}).get('items', [])
+        # Verificar se a resposta contém itens
+        if items:
             print(f'Total de itens carregados: {len(items)}')
-            print_limited_items(items)
             return items
         else:
-            print(f'Estrutura inesperada na resposta da API: {items}')
+            print(f'Estrutura inesperada na resposta da API: {response_data}')
             return None
     except requests.exceptions.HTTPError as http_err:
         print(f'Erro HTTP: {http_err}')
