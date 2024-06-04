@@ -1,13 +1,3 @@
-from bs4 import BeautifulSoup
-
-def clean_html(raw_html):
-    if raw_html is None:
-        raw_html = ""
-    soup = BeautifulSoup(raw_html, "html.parser")
-    cleaned_text = soup.get_text()
-    cleaned_text = cleaned_text.replace("🌟", "")
-    return cleaned_text
-
 def get_latest_price(product):
     price_history = product.get('priceCostHistory', [])
     latest_price = 0
@@ -17,31 +7,19 @@ def get_latest_price(product):
     return latest_price
 
 def transform_product_to_import_format(product):
-    cleaned_description = clean_html(product.get('description', ''))
-    if not cleaned_description:
-        cleaned_description = "Sem descrição."
     return {
-        "classe": 0,
-        "segmento": product.get('segmento', ''),
-        "gtnean": product.get('ean', ''),
-        "ncm": product.get('ncm', ''),
-        "descricao": cleaned_description,
-        "observacoes": product.get('observacoes', ''),
-        "tipo": 1,
-        "referencia": product.get('reference', ''),
-        "origem": product.get('origem', 'BR'),  # Definindo "BR" como valor padrão
-        "marca": product.get('brand', ''),
-        "modelo": product.get('modelo', ''),
-        "fornecedor": product.get('fornecedor', ''),
-        "tipoMedicamente": 0,
-        "registerAnvisa": product.get('registerAnvisa', ''),
-        "ppb": product.get('ppb', False),
-        "altura": product.get('height', 0) if product.get('height') is not None else 0,
-        "largura": product.get('width', 0) if product.get('width') is not None else 0,
-        "comprimento": product.get('itemLength', 0) if product.get('itemLength') is not None else 0,
-        "peso": product.get('grossWeight', 0) if product.get('grossWeight') is not None else 0,
-        "unidade": product.get('dimension', ''),
-        "custo": get_latest_price(product),  # Usando o valor mais recente como custo
-        "valorProposta": 1,  # Valor da proposta definido como 1 por padrão
-        "valorLimite": 0
+        "description": product.get('name', 'Sem descrição.'),
+        "ppb": product.get('ppb', None),
+        "type": 1,
+        "medOrTec": product.get('tipoMedicamente', False),
+        "origin": product.get('origem', None),
+        "reference": product.get('reference', ''),
+        "height": product.get('height', 0) if product.get('height') is not None else 0,
+        "length": product.get('itemLength', 0) if product.get('itemLength') is not None else 0,
+        "weight": product.get('grossWeight', 0) if product.get('grossWeight') is not None else 0,
+        "width": product.get('width', 0) if product.get('width') is not None else 0,
+        "unity": product.get('dimension', 'a'),
+        "cost": get_latest_price(product),
+        "value": 0.0001,
+        "minValue": 0
     }
